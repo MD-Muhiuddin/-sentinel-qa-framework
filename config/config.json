@@ -1,0 +1,23 @@
+{
+  "environments": {
+    "DEV": {
+      "url": "https://demoqa.com/profile",
+      "username": "dev_admin",
+      "password": "dev_password",
+      "timeout": 10,
+	  "MAX_NUMBER_OF_ATTEMPTS":3
+    },
+    "QA": {
+      "url": "",
+      "username": "qa_user",
+      "password": "qa_password",
+      "timeout": 20
+    },
+    "UAT": {
+      "url": "",
+      "username": "uat_user",
+      "password": "uat_password",
+      "timeout": 30
+    }
+  }
+}
