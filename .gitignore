@@ -1,8 +1,15 @@
-/target/
-/test-output/
-/.settings/
-/screenshots/
-/logs/
-/report.html
-/.project
-/.classpath
+# Maven build output
+target/
+test-output/
+
+# Eclipse IDE files (Crucial)
+.settings/
+.settings.json
+.vscode
+.project
+.classpath
+
+# Framework specific artifacts
+screenshots/
+logs/
+report.html
