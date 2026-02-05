@@ -29,7 +29,7 @@
 
 ### 💡 Core Philosophy
 - **Maintainability**: Locators are strictly isolated from test logic using the Page Object Model (POM).  
-- **Scalability**: Run 1 or 1,000 tests in parallel with zero session leakage via `ThreadLocal`.  
+- **Scalability**: Run 1 or 1,000 tests in parallel with zero session leakage via `ThreadLocal`.(depends on the resoruce Of server)  
 - **Observability**: Every action is logged via **Log4j2**, and every failure is captured visually via **Extent Reports**.  
 - **Flakiness Mitigation**: Achieved using a custom `RetryAnalyzer` and intelligent **Explicit Waits**.  
 
@@ -58,7 +58,11 @@ The framework follows a modular **Layered Architecture**. This ensures that:
 ### 🏛️ The Engine Flow: Thread-Safe Session Management
 - **ThreadLocal Isolation**  
   Uses `ThreadLocal<WebDriver>` to ensure that parallel tests remain completely independent in memory. Chrome and Firefox tests can run simultaneously without interference.
+- Think of ThreadLocal like a row of lockers.
+  Thread 1 puts "Chrome" and "QA" in Locker 1.
+  Thread 2 puts "Firefox" and "DEV" in Locker 2.
 
+They never touch each other's data.
 - **The Master Constructor**  
   A centralized initialization engine in `BrowserUtility` handles:
   - Cloud execution (LambdaTest)  
@@ -197,17 +201,29 @@ Every click sequence includes:
 
 ## 8. Execution Guide
 ### Option 1
- 1. Right click on testng.xml
- 2. Run as TestNG Suite
+ 1. Right click on testng.xml -> Run as TestNG Suite
+ 2. mvn clean test (From cli)
 
 ### Option 2
-1. Standard Run
+* CLI mvn Flow: CLI (-D) ➔ pom.xml ➔ testng.xml ➔ TestBase (@Parameters) **
+* Standard Run via CLI This is the architecture you just set up. It is best for Standard Configurations (Browser, Env, Cloud flags).
+
+### To Rur full test 
 
 ```bash 
+   
     mvn test
 ```
+```bash
+mvn clean test
+```
 
-2. Custom Run(Pverride Parameters)
+### passing one parameter and run with its default parameters
+```bash
+
+mvn clean test -DENV=QA
+```
+### Custom Run(Pverride Parameters)
 ```bash
 # Run on QA, Firefox, Headless
 mvn test -Dbrowser=firefox  -DisHeadLess=true -Denv=QA -X
@@ -216,7 +232,37 @@ mvn test -Dbrowser=firefox  -DisHeadLess=true -Denv=QA -X
 mvn test -Dbrowser=Chrome  -DisHeadLess=true -Denv=QA -X
 
 # Run on Cloud (LambdaTest)
-mvn test -Dbrowser=chrome -DisLambdaTest=true -Denv=qa -X
+mvn test -Dbrowser=chrome -DisLambdaTest=true -Denv=DEV -X
+
+```
+
+### Group Test
+```bash
+# Run only tests tagged with @Test(groups = "sanity")
+mvn clean test -Dgroups="sanity"
+```
+### Targeted Test
+```bash
+#Run a specific test class or method (great for debugging).
+mvn clean test -Dtest=LoginTest
+mvn clean test -Dtest=LoginTest# validLoginTest
+```
+
+### WildCard test
+```bash
+mvn clean test -Dtest=Log* # Runs LoginTest, LogoutTest, etc.(Wildcard)
+```
+
+### Parameterized Environement
+```bash
+mvn clean test -DisLambdaTest=true -DisHeadLess=true -DENV=QA
+```
+### with RetryCountTest
+```bash
+pass parameter from mvn cli
+mvn clean test -DisHeadLess=true -DENV=dev -DretryCount=1
+
+
 ```
 
 ## 9. Reporting & Logs
@@ -233,9 +279,6 @@ Interactive dashboard with pie charts and step-by-step execution logs.
 ### Log4j2 Logs
 * logs/application.log
 Detailed logs with Thread IDs for easier debuggin
-<img src="./ShowcaseResources/log1.png" alt="Framework diagram" width="600">
-<img src="./ShowcaseResources/log2.png" alt="Framework diagram" width="600">
-<img src="./ShowcaseResources/log3.png" alt="Framework diagram" width="600">
 
 
 ## 10. Future Roadmap
@@ -256,5 +299,6 @@ Specialization: SQA Engineer | Software Quality Assurance
 
 🛡️ SentinelQA: Ensuring good quality software development processes with DevOps best practices.
 
-## 12. Project Exetution Video
-  * Yourtube Link 
+## 12. Project Exetution 
+ <img src="./ShowcaseResources/log.gif" alt="Framework diagram" width="600">
+ <img src="./ShowcaseResources/ThreadedWindows.gif" alt="Framework diagram" width="600">
