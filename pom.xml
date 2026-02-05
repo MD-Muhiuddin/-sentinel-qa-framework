@@ -17,6 +17,7 @@
 		<isLambdaTest>false</isLambdaTest>
 		<isHeadLess>false</isHeadLess>
 		<ENV>DEV</ENV>
+		<retryCount>2</retryCount>
 	</properties>
 
 	<build>
@@ -40,6 +41,7 @@
 						<isLambDaTest>${isLambdaTest}</isLambDaTest>
 						<isHeadLess>${isHeadLess}</isHeadLess>
 						<ENV>${ENV}</ENV>
+						<retryCount>${retryCount}</retryCount>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
@@ -87,7 +89,6 @@
 			<version>5.5.1</version>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>

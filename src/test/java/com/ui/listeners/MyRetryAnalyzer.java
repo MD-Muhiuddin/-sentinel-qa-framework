@@ -3,35 +3,52 @@ package com.ui.listeners;
 import org.apache.logging.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
-
-import com.constants.Env;
 import com.utility.JsonConfigUtility;
 import com.utility.LoggerUtility;
-import com.utility.PropertiesUtility;
 
-public class MyRetryAnalyzer implements IRetryAnalyzer { // IRetryAnalyzer --> TestNG library
+public class MyRetryAnalyzer implements IRetryAnalyzer {
 
-	// from json environment
-	private static final int MAX_NUMBER_OF_ATTEMPTS = JsonConfigUtility.getEnvData("DEV").getMAX_NUMBER_OF_ATTEMPTS();
+    // 1. We initialize this variable dynamically inside the Constructor or a static block
+    private static int maxRetryCount;
 
-	// from properties(optional)
-	// private static final int MAX_NUMBER_OF_ATTEMPTS =
-	// Integer.parseInt(PropertiesUtility.readProperty(Env.QA,"MAX_NUMBER_OF_ATTEMPTS"));
+    static {
+        // PRIORITY 1: Check if "retryCount" is passed directly from Maven (-DretryCount=3)
+        String directRetry = System.getProperty("retryCount");
+        
+        if (directRetry != null) {
+            maxRetryCount = Integer.parseInt(directRetry);
+            
+        } else {
+            // PRIORITY 2: Check "ENV" variable and read from Config.json
+            String env = System.getProperty("ENV");
+            
+            // Default to "DEV" if running from IDE without settings
+            if (env == null || env.isEmpty()) {
+                env = "DEV";
+            }
+            
+            // Fetch from JSON (e.g., QA -> 2 retries)
+            try {
+                maxRetryCount = JsonConfigUtility.getEnvData(env.toUpperCase()).getMAX_NUMBER_OF_ATTEMPTS();
+            } catch (Exception e) {
+                maxRetryCount = 1; // Safety Fallback if JSON fails
+            }
+        }
+    }
 
-	private int currentAttempt = 1;
-	Logger logger = LoggerUtility.getLogger(this.getClass());
+    private int currentAttempt = 1;
+    Logger logger = LoggerUtility.getLogger(this.getClass());
 
-	@Override
-	public boolean retry(ITestResult result) { // ITestResult gives me the Information about the test
-		if (currentAttempt <= MAX_NUMBER_OF_ATTEMPTS) {
-			logger.info("----------------------------------------------------------------------------------");
-			logger.warn("🔄 RETRYING TEST: " + result.getMethod().getMethodName());
-			logger.info("   Attempt No   : " + currentAttempt + " / " + MAX_NUMBER_OF_ATTEMPTS);
-			logger.info("----------------------------------------------------------------------------------");
-			currentAttempt++;
-			return true;
-		}
-		return false;
-	}
-
+    @Override
+    public boolean retry(ITestResult result) {
+        if (currentAttempt <= maxRetryCount) {
+            logger.info("***********************************************************************************");
+            logger.warn("🔄 RETRYING TEST: " + result.getMethod().getMethodName());
+            logger.info("   Attempt No    : " + currentAttempt + " / " + maxRetryCount);
+            logger.info("************************************************************************************");
+            currentAttempt++;
+            return true;
+        }
+        return false;
+    }
 }
